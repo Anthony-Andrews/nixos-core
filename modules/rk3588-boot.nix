@@ -18,8 +18,18 @@ let
   # Linux the system's dtbs/<fdtfile> (extlinux FDTDIR).
   uboot = pkgs.buildUBoot {
     defconfig = "generic-rk3588_defconfig";
+    # Jonas Karlman's fix, in review upstream: without it SPL may never set the CPU PLLs and the
+    # big cores boot Linux at 24 MHz. Drop once it's in a U-Boot release.
+    extraPatches = [
+      (pkgs.fetchpatch {
+        url = "https://github.com/flipperdevices/u-boot/commit/94fb5a0582d2411eb81096fbdc490704b385b570.patch";
+        hash = "sha256-6xzx/i18IBwrsBO1W2gWNHyH34K8UbgSpZBhRbOlPq8=";
+      })
+    ];
+    # No autoboot countdown; a key held at power-on still stops autoboot.
     extraConfig = ''
       CONFIG_DEFAULT_FDT_FILE="${config.hardware.rk3588.fdtfile}"
+      CONFIG_BOOTDELAY=0
     '';
     extraMeta.platforms = [ "aarch64-linux" ];
     env = {
@@ -57,6 +67,7 @@ in
 
     boot.loader.grub.enable = false;
     boot.loader.generic-extlinux-compatible.enable = true;
+    boot.loader.timeout = 0; # no extlinux menu; boot the newest generation straight away
 
     sdImage = {
       compressImage = false; # rkdeveloptool writes raw images only

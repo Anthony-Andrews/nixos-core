@@ -13,6 +13,9 @@ in {
   nixpkgs.hostPlatform = "aarch64-linux";
   # The 26.05 default kernel (6.18) predates the CM5 device tree.
   boot.kernelPackages = pkgs.linuxPackages_latest;
+  # Stopgap until the patched U-Boot is flashed: unpack the initramfs on the boot core rather
+  # than on a big core still running at 24 MHz.
+  boot.kernelParams = [ "initramfs_async=0" ];
   # Every dts/<name>.dts, built against the kernel's sources. U-Boot boots the one named by
   # hardware.rk3588.fdtfile, so all compute modules share this system.
   hardware.deviceTree.dtbSource = pkgs.runCommandCC "dtbs" { nativeBuildInputs = [ pkgs.dtc ]; } ''
@@ -32,6 +35,7 @@ in {
     publish.enable = true;
     publish.addresses = true;
   };
+  networking.dhcpcd.wait = "background"; # don't hold up boot waiting for a DHCP lease
   services.openssh.enable = true;
   users.users.deploy = {
     isNormalUser = true;
