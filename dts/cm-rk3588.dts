@@ -1,0 +1,7 @@
+// Our compute module on the common carrier. It is pin-compatible with the Radxa CM5, so it
+// starts from Radxa's tree; override whatever differs on our module below.
+#include "rockchip/rk3588s-radxa-cm5-io.dts"
+
+/ {
+	model = "cm-rk3588";
+};

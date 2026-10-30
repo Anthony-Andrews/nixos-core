@@ -1,0 +1,2 @@
+// Radxa CM5 on the common carrier (mainline's CM5 IO board).
+#include "rockchip/rk3588s-radxa-cm5-io.dts"
